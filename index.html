@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TronLink Message Signer with Connect</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <h2>TronLink Message Signer (with Wallet Connect Prompt)</h2>
+  <p><strong>Instructions:</strong> Open this page in Chrome or Brave with your TronLink wallet installed and unlocked. Click "Connect Wallet" first to authorize access.</p>
+
+  <button onclick="connectWallet()">Connect TronLink Wallet</button><br><br>
+
+  <textarea id="message" rows="4" cols="80">I confirm that I own the TRON wallet address TNU2X3wn52WWgSaeCjy7YB4bSeUSyjWe4T on behalf of Prosperia Holdings LLC. Signed on March 11, 2025.</textarea><br><br>
+  <button onclick="signMessage()">Sign Message with TronLink</button>
+
+  <pre id="output" style="margin-top:20px; background-color:#f0f0f0; padding:10px;"></pre>
+
+  <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/TronWeb.js"></script>
+  <script>
+    async function connectWallet() {
+      if (window.tronLink) {
+        try {
+          const result = await window.tronLink.request({ method: 'tron_requestAccounts' });
+          document.getElementById("output").textContent = "Wallet connected: " + tronWeb.defaultAddress.base58;
+        } catch (error) {
+          document.getElementById("output").textContent = "Connection rejected: " + error.message;
+        }
+      } else {
+        document.getElementById("output").textContent = "TronLink is not installed.";
+      }
+    }
+
+    async function signMessage() {
+      if (!window.tronWeb || !tronWeb.defaultAddress.base58) {
+        document.getElementById("output").textContent = "Wallet not connected. Click 'Connect TronLink Wallet' first.";
+        return;
+      }
+
+      try {
+        const message = document.getElementById("message").value;
+        const signedMsg = await tronWeb.trx.signMessage(message);
+        document.getElementById("output").textContent =
+          `Wallet Address: ${tronWeb.defaultAddress.base58}\n\nMessage: ${message}\n\nMessage Signature:\n${signedMsg}`;
+      } catch (err) {
+        document.getElementById("output").textContent = "Error signing message: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
 
